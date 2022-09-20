@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+
+
+<title>Velocity computation</title>
+
+<script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
+// be compatible with the behavior of Pandoc < 2.8).
+document.addEventListener('DOMContentLoaded', function(e) {
+  var hs = document.querySelectorAll("div.section[class*='level'] > :first-child");
+  var i, h, a;
+  for (i = 0; i < hs.length; i++) {
+    h = hs[i];
+    if (!/^h[1-6]$/i.test(h.tagName)) continue;  // it should be a header h1-h6
+    a = h.attributes;
+    while (a.length > 0) h.removeAttribute(a[0].name);
+  }
+});
+</script>
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+
+
+<style type="text/css">
+  code {
+    white-space: pre;
+  }
+  .sourceCode {
+    overflow: visible;
+  }
+</style>
+<style type="text/css" data-origin="pandoc">
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+
+</style>
+<script>
+// apply pandoc div.sourceCode style to pre.sourceCode instead
+(function() {
+  var sheets = document.styleSheets;
+  for (var i = 0; i < sheets.length; i++) {
+    if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
+    try { var rules = sheets[i].cssRules; } catch (e) { continue; }
+    for (var j = 0; j < rules.length; j++) {
+      var rule = rules[j];
+      // check if there is a div.sourceCode rule
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") continue;
+      var style = rule.style.cssText;
+      // check if color or background-color is set
+      if (rule.style.color === '' && rule.style.backgroundColor === '') continue;
+      // replace div.sourceCode by a pre.sourceCode rule
+      sheets[i].deleteRule(j);
+      sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
+    }
+  }
+})();
+</script>
+
+
+
+<style type="text/css">
+/* for pandoc --citeproc since 2.11 */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+}
+.hanging div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}
+</style>
+
+<style type="text/css">body {
+background-color: #fff;
+margin: 1em auto;
+max-width: 700px;
+overflow: visible;
+padding-left: 2em;
+padding-right: 2em;
+font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+font-size: 14px;
+line-height: 1.35;
+}
+#TOC {
+clear: both;
+margin: 0 0 10px 10px;
+padding: 4px;
+width: 400px;
+border: 1px solid #CCCCCC;
+border-radius: 5px;
+background-color: #f6f6f6;
+font-size: 13px;
+line-height: 1.3;
+}
+#TOC .toctitle {
+font-weight: bold;
+font-size: 15px;
+margin-left: 5px;
+}
+#TOC ul {
+padding-left: 40px;
+margin-left: -1.5em;
+margin-top: 5px;
+margin-bottom: 5px;
+}
+#TOC ul ul {
+margin-left: -2em;
+}
+#TOC li {
+line-height: 16px;
+}
+table {
+margin: 1em auto;
+border-width: 1px;
+border-color: #DDDDDD;
+border-style: outset;
+border-collapse: collapse;
+}
+table th {
+border-width: 2px;
+padding: 5px;
+border-style: inset;
+}
+table td {
+border-width: 1px;
+border-style: inset;
+line-height: 18px;
+padding: 5px 5px;
+}
+table, table th, table td {
+border-left-style: none;
+border-right-style: none;
+}
+table thead, table tr.even {
+background-color: #f7f7f7;
+}
+p {
+margin: 0.5em 0;
+}
+blockquote {
+background-color: #f6f6f6;
+padding: 0.25em 0.75em;
+}
+hr {
+border-style: solid;
+border: none;
+border-top: 1px solid #777;
+margin: 28px 0;
+}
+dl {
+margin-left: 0;
+}
+dl dd {
+margin-bottom: 13px;
+margin-left: 13px;
+}
+dl dt {
+font-weight: bold;
+}
+ul {
+margin-top: 0;
+}
+ul li {
+list-style: circle outside;
+}
+ul ul {
+margin-bottom: 0;
+}
+pre, code {
+background-color: #f7f7f7;
+border-radius: 3px;
+color: #333;
+white-space: pre-wrap; 
+}
+pre {
+border-radius: 3px;
+margin: 5px 0px 10px 0px;
+padding: 10px;
+}
+pre:not([class]) {
+background-color: #f7f7f7;
+}
+code {
+font-family: Consolas, Monaco, 'Courier New', monospace;
+font-size: 85%;
+}
+p > code, li > code {
+padding: 2px 0px;
+}
+div.figure {
+text-align: center;
+}
+img {
+background-color: #FFFFFF;
+padding: 2px;
+border: 1px solid #DDDDDD;
+border-radius: 3px;
+border: 1px solid #CCCCCC;
+margin: 0 5px;
+}
+h1 {
+margin-top: 0;
+font-size: 35px;
+line-height: 40px;
+}
+h2 {
+border-bottom: 4px solid #f7f7f7;
+padding-top: 10px;
+padding-bottom: 2px;
+font-size: 145%;
+}
+h3 {
+border-bottom: 2px solid #f7f7f7;
+padding-top: 10px;
+font-size: 120%;
+}
+h4 {
+border-bottom: 1px solid #f7f7f7;
+margin-left: 8px;
+font-size: 105%;
+}
+h5, h6 {
+border-bottom: 1px solid #ccc;
+font-size: 105%;
+}
+a {
+color: #0033dd;
+text-decoration: none;
+}
+a:hover {
+color: #6666ff; }
+a:visited {
+color: #800080; }
+a:visited:hover {
+color: #BB00BB; }
+a[href^="http:"] {
+text-decoration: underline; }
+a[href^="https:"] {
+text-decoration: underline; }
+
+code > span.kw { color: #555; font-weight: bold; } 
+code > span.dt { color: #902000; } 
+code > span.dv { color: #40a070; } 
+code > span.bn { color: #d14; } 
+code > span.fl { color: #d14; } 
+code > span.ch { color: #d14; } 
+code > span.st { color: #d14; } 
+code > span.co { color: #888888; font-style: italic; } 
+code > span.ot { color: #007020; } 
+code > span.al { color: #ff0000; font-weight: bold; } 
+code > span.fu { color: #900; font-weight: bold; } 
+code > span.er { color: #a61717; background-color: #e3d2d2; } 
+</style>
+
+
+
+
+</head>
+
+<body>
+
+
+
+
+<h1 class="title toc-ignore">Velocity computation</h1>
+
+
+
+<p>Because the gaze samples tend to be noisy, different methods use
+various approaches for computing velocity from noisy samples. Methods by
+<span class="citation">Engbert and Kliegl (2003)</span> and <span class="citation">Otero-Millan et al. (2014)</span> used the same
+approach based on averaging over multiple samples to compute velocity,
+whereas <span class="citation">Nyström and Holmqvist (2010)</span>
+compute a simple derivative and then filter it. By default, package uses
+the former approach (<code>velocity_function = diff_ek</code>) but you
+can also use the latter (<code>velocity_function = diff_nh</code>) or
+implement a custom method (see below). Acceleration is computed the same
+way but from velocity samples.</p>
+<div id="differentiation-following-engbertkliegl2003" class="section level2">
+<h2>Differentiation following <span class="citation">Engbert and Kliegl
+(2003)</span></h2>
+<p>This method computes velocity over a predefined time window
+controlled via <code>ek_velocity_time_window</code> that defaults to 20
+ms. The width of the window is converted to samples based on the
+<code>sampling_rate</code> parameter and is ensured to be an
+<em>odd</em> number equal to or larger than 3. I.e., for a window that
+is three samples long, the velocity is computed based on one sample
+before and one sample after the current, for a five-samples window - two
+samples before and after, etc. The code always starts with the requested
+window size but all iteratively reduces it by two samples to accommodate
+for trial limits and missing values. An <code>NA</code> velocity is
+returned only if even the smallest window (three samples wide) cannot be
+used.</p>
+<p>In general, horizontal and vertical velocity components are computed
+as <span class="math display">\[v_x[i] =
+\frac{\sum_{j=1}^{(N-1)/2}x[i+j] -
+x[i-j]}{\sum_{j=1}^{(N-1)/2}2j\cdot\Delta t}\]</span> where <span class="math inline">\(i\)</span> is the index of a sample, <span class="math inline">\(\Delta t = \frac{1}{sample~rate}\)</span> is a
+duration of a single sampling frame, and <span class="math inline">\(N\)</span> is an <em>odd</em> integer width of the
+moving average used to compute the velocity. In <span class="citation">Engbert and Kliegl (2003)</span>, <span class="math inline">\(N=5\)</span> and <span class="math inline">\(\Delta t = 4\)</span> (250 Hz sampling rate)
+translate into a 20 ms moving average window (default value used in the
+method implementation). Below is a derivation that shows the equivalence
+of the formula above to formula 1 in <span class="citation">Engbert and
+Kliegl (2003)</span>. For <span class="math inline">\(N=5\)</span>:
+<span class="math display">\[\frac{\sum_{j=1}^{(5-1)/2}x[i+j] -
+x[i-j]}{\sum_{j=1}^{(5-1)/2}2j\cdot\Delta t}=\]</span> <span class="math display">\[\frac{\sum_{j=1}^{2}x[i+j] -
+x[i-j]}{\sum_{j=1}^{2}2j\cdot\Delta t}=\]</span></p>
+<p><span class="math display">\[\frac{x[i+1] - x[i-1]+x[i+2] -
+x[i-2]}{2\Delta t + 4\Delta t}=\]</span> <span class="math display">\[\frac{x[i+2] + x[i+1] - x[i-1] - x[i-2]}{6\Delta
+t}\]</span></p>
+</div>
+<div id="differentiation-following-nystromholmqvist2010" class="section level2">
+<h2>Differentiation following <span class="citation">Nyström and
+Holmqvist (2010)</span></h2>
+<p>Horizontal and vertical components of velocity are computed from
+adjacent samples, the amplitude is computed from the components and then
+is filtered using the <a href="https://en.wikipedia.org/wiki/Savitzky%E2%80%93Golay_filter">Savitzky-Golay
+filter</a>. Filter order is controlled via
+<code>nh_sg_filter_order</code> option and defaults to
+<code>2</code>.</p>
+</div>
+<div id="comparing-two-methods" class="section level2">
+<h2>Comparing two methods</h2>
+<p>The two methods produce comparable but different velocity values.
+However, this has only a minor effect on saccade detection, see a
+vignette on <em>Using sample votes</em>.</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># computing velocity using two methods</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>vel_ek <span class="ot">&lt;-</span> saccadr<span class="sc">::</span><span class="fu">diff_ek</span>(<span class="at">x =</span> single_trial<span class="sc">$</span>x,</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>                           <span class="at">y =</span> single_trial<span class="sc">$</span>y,</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>                           <span class="at">trial =</span> <span class="fu">rep</span>(<span class="dv">1</span>, <span class="fu">nrow</span>(single_trial)),</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>                           <span class="at">sample_rate =</span> <span class="dv">500</span>)</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>vel_nh <span class="ot">&lt;-</span> saccadr<span class="sc">::</span><span class="fu">diff_nh</span>(<span class="at">x =</span> single_trial<span class="sc">$</span>x,</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>                           <span class="at">y =</span> single_trial<span class="sc">$</span>y,</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>                           <span class="at">trial =</span> <span class="fu">rep</span>(<span class="dv">1</span>, <span class="fu">nrow</span>(single_trial)),</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>                           <span class="at">sample_rate =</span> <span class="dv">500</span>)</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>vel_comparison <span class="ot">&lt;-</span> <span class="fu">na.omit</span>(<span class="fu">data.frame</span>(<span class="at">EK =</span> vel_ek[[<span class="st">&#39;amp&#39;</span>]], <span class="at">NH =</span> vel_nh[[<span class="st">&#39;amp&#39;</span>]])) <span class="sc">%&gt;%</span></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">filter</span>(NH <span class="sc">&gt;</span> <span class="dv">0</span>) <span class="sc">%&gt;%</span> <span class="co"># values can be negative due to filtering</span></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">mutate</span>(<span class="at">logEK =</span> <span class="fu">log</span>(EK), <span class="at">logNH =</span> <span class="fu">log</span>(NH)) </span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a><span class="co"># plotting amplitude comparison</span></span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>pearson_rho <span class="ot">&lt;-</span> <span class="fu">cor</span>(vel_comparison[[<span class="st">&#39;EK&#39;</span>]], vel_comparison[[<span class="st">&#39;NH&#39;</span>]])</span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(<span class="at">data =</span> vel_comparison, <span class="fu">aes</span>(<span class="at">x =</span> EK, <span class="at">y =</span> NH)) <span class="sc">+</span></span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_abline</span>() <span class="sc">+</span></span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>() <span class="sc">+</span></span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_x_log10</span>() <span class="sc">+</span></span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_y_log10</span>() <span class="sc">+</span></span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">subtitle =</span> <span class="fu">sprintf</span>(<span class="st">&quot;Pearson&#39;s ρ = %.2f</span><span class="sc">\n</span><span class="st">Pearson&#39;s ρ for log transformed velocities = %.2f&quot;</span>, pearson_rho, <span class="fu">cor</span>(vel_comparison[[<span class="st">&#39;logEK&#39;</span>]], vel_comparison[[<span class="st">&#39;logNH&#39;</span>]])),</span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a>       <span class="at">x =</span> <span class="st">&quot;Vek&quot;</span>,</span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a>       <span class="at">y =</span> <span class="st">&quot;Vnh&quot;</span>)</span></code></pre></div>
+<p><img src="data:image/png;base64,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" width="100%" /></p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="co"># plotting </span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(<span class="at">data =</span> <span class="cn">NULL</span>, <span class="fu">aes</span>(<span class="at">x =</span> vel_comparison[[<span class="st">&#39;EK&#39;</span>]] <span class="sc">-</span> vel_comparison[[<span class="st">&#39;NH&#39;</span>]])) <span class="sc">+</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_histogram</span>(<span class="at">bins =</span> <span class="dv">50</span>) <span class="sc">+</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">xlab</span>(<span class="st">&quot;Vek - Vnh&quot;</span>) <span class="sc">+</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">&quot;Difference in velocities computed via two methods&quot;</span>)</span></code></pre></div>
+<p><img src="data:image/png;base64,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" width="100%" /></p>
+</div>
+<div id="implementing-and-using-a-custom-differentiation-function" class="section level2">
+<h2>Implementing and using a custom differentiation function</h2>
+<p>A custom function should be as a follows</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>diff_custom <span class="ot">&lt;-</span> <span class="cf">function</span>(x, y,  trial, sample_rate, <span class="at">options=</span><span class="cn">NULL</span>) {</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>  <span class="co"># compute vertical and horizontal components</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>  df <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">x =</span> ..., <span class="co"># differentiate values of x </span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>                   <span class="at">y =</span> ...) <span class="co"># differentiate values of y</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>  <span class="co"># compute amplitude</span></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>  df[[<span class="st">&#39;amp&#39;</span>]] <span class="ot">=</span> <span class="fu">sqrt</span>(df[[<span class="st">&#39;x&#39;</span>]]<span class="sc">^</span><span class="dv">2</span> <span class="sc">+</span> df[[<span class="st">&#39;y&#39;</span>]]<span class="sc">^</span><span class="dv">2</span>)<span class="er">)</span></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>  <span class="co"># return a data.frame with columns x, y, and amp</span></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(df)</span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
+<p>Arguments that are passed to the function (all vectors have the same
+length):</p>
+<ul>
+<li><code>x</code>, <code>y</code> vectors with values, either x and y
+gaze coordinates or velocity components (for acceleration).</li>
+<li><code>sample_rate</code> scalar value in Hz.</li>
+<li><code>trial</code> vector with trial index per sample.</li>
+<li><code>options</code> a named list with method-specific options. See
+the example below for how to use them. See also
+<code>option_or_default()</code> function.</li>
+</ul>
+<p>The function must return a data.frame with three columns:
+<code>x</code> (horizontal component), <code>y</code> (vertical
+component), and <code>amp</code> (amplitude).</p>
+<p>Here is an example of a simple velocity function that respects trial
+borders</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>diff_custom <span class="ot">&lt;-</span> <span class="cf">function</span>(x, y,  trial, sample_rate, <span class="at">options=</span><span class="cn">NULL</span>) {</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>  <span class="co"># computing frame time step </span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>  delta_t_s <span class="ot">&lt;-</span> <span class="dv">1</span> <span class="sc">/</span> sample_rate</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>  <span class="co"># --- differentiate (compute velocity or acceleration) and filter</span></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">data.frame</span>(<span class="at">trial =</span> trial,</span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>             <span class="at">x =</span> x,</span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>             <span class="at">y =</span> y) <span class="sc">%&gt;%</span></span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>    <span class="co"># compute velocity and acceleration for each trial</span></span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>    <span class="fu">group_by</span>(trial) <span class="sc">%&gt;%</span></span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">x =</span> (x <span class="sc">-</span> <span class="fu">lag</span>(x)) <span class="sc">/</span> delta_t_s,</span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a>           <span class="at">y =</span> (y <span class="sc">-</span> <span class="fu">lag</span>(y)) <span class="sc">/</span> delta_t_s,</span>
+<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a>           <span class="at">amp =</span> <span class="fu">sqrt</span>(x<span class="sc">^</span><span class="dv">2</span> <span class="sc">+</span> y<span class="sc">^</span><span class="dv">2</span>))</span>
+<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
+<p>And here is a similar function but that uses an optional
+<code>custom_velocity_lag</code> parameter so that it can be different
+from 1</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>diff_lag_n <span class="ot">&lt;-</span> <span class="cf">function</span>(x, y,  trial, sample_rate, <span class="at">options=</span><span class="cn">NULL</span>) {</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>  <span class="co"># obtain lag or use default</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>  lag_n <span class="ot">&lt;-</span> saccadr<span class="sc">::</span><span class="fu">option_or_default</span>(options, <span class="st">&quot;custom_velocity_lag&quot;</span>, <span class="dv">1</span>)</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>  <span class="co"># computing frame time step </span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>  delta_t_s <span class="ot">&lt;-</span> <span class="dv">1</span> <span class="sc">/</span> sample_rate</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>  <span class="co"># --- differentiate (compute velocity or acceleration) and filter</span></span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">data.frame</span>(<span class="at">trial =</span> trial,</span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>             <span class="at">x =</span> x,</span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>             <span class="at">y =</span> y) <span class="sc">%&gt;%</span></span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>    <span class="co"># compute velocity and acceleration for each trial</span></span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>    <span class="fu">group_by</span>(trial) <span class="sc">%&gt;%</span></span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">x =</span> (x <span class="sc">-</span> <span class="fu">lag</span>(x, lag_n)) <span class="sc">/</span> delta_t_s,</span>
+<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a>           <span class="at">y =</span> (y <span class="sc">-</span> <span class="fu">lag</span>(y, lag_n)) <span class="sc">/</span> delta_t_s,</span>
+<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a>           <span class="at">amp =</span> <span class="fu">sqrt</span>(x<span class="sc">^</span><span class="dv">2</span> <span class="sc">+</span> y<span class="sc">^</span><span class="dv">2</span>))</span>
+<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
+</div>
+<div id="references" class="section level2 unnumbered">
+<h2 class="unnumbered">References</h2>
+<div id="refs" class="references csl-bib-body hanging-indent">
+<div id="ref-EngbertKliegl2003" class="csl-entry">
+Engbert, Ralf, and Reinhold Kliegl. 2003. <span>“<span class="nocase">Microsaccades uncover the orientation of covert
+attention</span>.”</span> <em>Vision Research</em> 43 (9): 1035–45. <a href="https://doi.org/10.1016/S0042-6989(03)00084-1">https://doi.org/10.1016/S0042-6989(03)00084-1</a>.
+</div>
+<div id="ref-NystromHolmqvist2010" class="csl-entry">
+Nyström, Marcus, and Kenneth Holmqvist. 2010. <span>“<span class="nocase">An adaptive algorithm for fixation, saccade, and glissade
+detection in eyetracking data</span>.”</span> <em>Behavior Research
+Methods</em> 42 (1): 188–204. <a href="https://doi.org/10.3758/BRM.42.1.188">https://doi.org/10.3758/BRM.42.1.188</a>.
+</div>
+<div id="ref-Otero-Millan2014" class="csl-entry">
+Otero-Millan, J., Jose L Alba Castro, Stephen L Macknik, and S.
+Martinez-Conde. 2014. <span>“<span class="nocase">Unsupervised
+clustering method to detect microsaccades</span>.”</span> <em>Journal of
+Vision</em> 14 (2): 18–18. <a href="https://doi.org/10.1167/14.2.18">https://doi.org/10.1167/14.2.18</a>.
+</div>
+</div>
+</div>
+
+
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
