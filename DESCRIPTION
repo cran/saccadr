@@ -1,8 +1,8 @@
 Package: saccadr
 Type: Package
 Title: Extract Saccades via an Ensemble of Methods Approach
-Version: 0.1.1
-Date: 2022-09-18
+Version: 0.1.2
+Date: 2023-05-03
 Authors@R: 
   person(given = "Alexander",
          family = "Pastukhov",
@@ -25,16 +25,16 @@ Imports: magrittr, Rcpp (>= 1.0.8)
 LinkingTo: Rcpp
 Encoding: UTF-8
 LazyData: true
-RoxygenNote: 7.2.1
+RoxygenNote: 7.2.3
 VignetteBuilder: knitr
 Depends: R (>= 4.1.0), dplyr, rlang, cluster, signal, tidyr
 Suggests: rmarkdown, knitr, ggplot2, spelling, testthat (>= 3.0.0)
 Language: en-US
 Config/testthat/edition: 3
 NeedsCompilation: yes
-Packaged: 2022-09-19 19:23:05 UTC; pastu
+Packaged: 2023-05-03 13:27:55 UTC; ba7dr4
 Author: Alexander Pastukhov [aut, cre]
     (<https://orcid.org/0000-0002-8738-8591>)
 Maintainer: Alexander Pastukhov <pastukhov.alexander@gmail.com>
 Repository: CRAN
-Date/Publication: 2022-09-20 09:16:09 UTC
+Date/Publication: 2023-05-04 13:20:02 UTC
