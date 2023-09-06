@@ -9,7 +9,7 @@ filter_via_savitzky_golay(x, sg_order)
 \arguments{
 \item{x}{vector of float}
 
-\item{sgOrder}{integer, order of the filter}
+\item{sg_order}{integer, order of the filter}
 }
 \value{
 vector of float

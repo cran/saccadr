@@ -1,7 +1,7 @@
 #' Smooths signal using Savitzky-Golay and then shifts the filtered signal back
 #'
 #' @param x vector of float
-#' @param sgOrder integer, order of the filter
+#' @param sg_order integer, order of the filter
 #'
 #' @return vector of float
 #' @importFrom signal sgolayfilt

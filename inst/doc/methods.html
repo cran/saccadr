@@ -382,10 +382,10 @@ method makes no assumptions about velocity in the units of degrees per
 second and can be used on any data (e.g., where samples encode gaze in
 screen position units).</p>
 <p>The standard deviation is computed following formula #2 in <span class="citation">Engbert and Kliegl (2003)</span> as</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sqrt</span>(<span class="fu">median</span>(x<span class="sc">^</span><span class="dv">2</span>) <span class="sc">-</span> <span class="fu">median</span>(x)<span class="sc">^</span><span class="dv">2</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a><span class="fu">sqrt</span>(<span class="fu">median</span>(x<span class="sc">^</span><span class="dv">2</span>) <span class="sc">-</span> <span class="fu">median</span>(x)<span class="sc">^</span><span class="dv">2</span>)</span></code></pre></div>
 <p>However, if the value is smaller than <a href="https://stat.ethz.ch/R-manual/R-devel/library/base/html/zMachine.html"><code>.Machine$double.eps</code></a>,
 it is recomputed via a mean estimator</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sqrt</span>(<span class="fu">mean</span>(x<span class="sc">^</span><span class="dv">2</span>) <span class="sc">-</span> <span class="fu">mean</span>(x)<span class="sc">^</span><span class="dv">2</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" tabindex="-1"></a><span class="fu">sqrt</span>(<span class="fu">mean</span>(x<span class="sc">^</span><span class="dv">2</span>) <span class="sc">-</span> <span class="fu">mean</span>(x)<span class="sc">^</span><span class="dv">2</span>)</span></code></pre></div>
 <p>Only a monocular version of the algorithm is implemented with
 binocular saccades computed using overlapping votes from two eyes. For
 method details and rationale for default parameter values refer to <span class="citation">Engbert and Kliegl (2003)</span>.</p>
